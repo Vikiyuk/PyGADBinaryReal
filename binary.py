@@ -1,5 +1,5 @@
 import random
-
+import time
 
 import benchmark_functions as bf
 import numpy as np
@@ -174,8 +174,10 @@ def pygadPerformance(parent_selection_type="tournament", crossover_type="single_
                            on_generation=callback_generation,
                            logger=logger)
 
-
+    start_time = time.time()
     ga_instance.run()
+    end_time = time.time()
+    elapsed_time = end_time - start_time
 
     solution, solution_fitness, solution_idx = ga_instance.best_solution()
     if ga_instance.fitness_func==fitness_function_Rosenbrock:
@@ -184,11 +186,14 @@ def pygadPerformance(parent_selection_type="tournament", crossover_type="single_
     else:
         print(f"Parameters: {parent_selection_type}, {crossover_type}, {mutation_type}")
         print(f"Best solution: {decodeInd(solution)}\nBest solution fitness: {solution_fitness}")
-    plt.figure(figsize=(12, 8))
 
+    print(f"Elapsed time: {elapsed_time:.2f} seconds")
+    print("")
+
+    plt.figure(figsize=(12, 8))
     plt.subplot(3, 1, 1)
     plt.plot(average_fitness, label='Average Fitness')
-    plt.title('Average Fitness over Generations')
+    plt.title(f"Parameters: {parent_selection_type}, {crossover_type}, {mutation_type}\nAverage Fitness over Generations")
     plt.xlabel('Generation')
     plt.ylabel('Average Fitness')
     plt.legend()
