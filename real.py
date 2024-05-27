@@ -51,6 +51,54 @@ def multiple_crossover(parents, offspring_size, ga_instance):
     
     return offspring
 
+def q_rand_point_crossover(parents, offspring_size, ga_instance):
+    n = parents.shape[1]
+    offspring = np.empty(offspring_size)
+
+    for idx in range(0, offspring_size[0], 2):
+        parent1_idx = idx % parents.shape[0]
+        parent2_idx = (idx + 1) % parents.shape[0]
+        Xt = parents[parent1_idx].copy()
+        Yt = parents[parent2_idx].copy()
+
+        k = random.randint(1, n-1)
+        cp = sorted(random.sample(range(1, n), k))
+
+        Xt_1 = np.zeros(n)
+        Yt_1 = np.zeros(n)
+
+        przełącz = 0
+        for i in range(cp[0]):
+            Xt_1[i] = Xt[i]
+            Yt_1[i] = Yt[i]
+
+        for j in range(1, k):
+            if przełącz == 0:
+                for i in range(cp[j - 1], cp[j]):
+                    Xt_1[i] = Yt[i]
+                    Yt_1[i] = Xt[i]
+                przełącz = 1
+            else:
+                for i in range(cp[j - 1], cp[j]):
+                    Xt_1[i] = Xt[i]
+                    Yt_1[i] = Yt[i]
+                przełącz = 0
+
+        if przełącz == 0:
+            for i in range(cp[k-1], n):
+                Xt_1[i] = Yt[i]
+                Yt_1[i] = Xt[i]
+        else:
+            for i in range(cp[k-1], n):
+                Xt_1[i] = Xt[i]
+                Yt_1[i] = Yt[i]
+
+        offspring[idx, :] = Xt_1
+        if idx + 1 < offspring_size[0]:
+            offspring[idx + 1, :] = Yt_1
+
+    return offspring
+
 def pygadPerformance(parent_selection_type="tournament", crossover_type="single_point", mutation_type="random"):
     level = logging.DEBUG
     name = 'logfile.txt'
@@ -106,3 +154,4 @@ pygadPerformance("tournament", "single_point", "swap")
 
 pygadPerformance("tournament", position_crossover)
 pygadPerformance("tournament", multiple_crossover)
+pygadPerformance("tournament", q_rand_point_crossover)
