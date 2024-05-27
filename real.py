@@ -99,6 +99,16 @@ def q_rand_point_crossover(parents, offspring_size, ga_instance):
 
     return offspring
 
+def gauss_mutation(offspring, ga_instance):
+    mutation_rate = 0.1
+
+    for chromosome_idx in range(offspring.shape[0]):
+        for gene_idx in range(offspring.shape[1]):
+            if np.random.rand() < mutation_rate:
+                offspring[chromosome_idx, gene_idx] += np.random.normal(0, 1)
+
+    return offspring
+
 def pygadPerformance(parent_selection_type="tournament", crossover_type="single_point", mutation_type="random"):
     level = logging.DEBUG
     name = 'logfile.txt'
@@ -151,6 +161,7 @@ pygadPerformance("tournament", "uniform")
 
 pygadPerformance("tournament", "single_point", "random")
 pygadPerformance("tournament", "single_point", "swap")
+pygadPerformance("tournament", "single_point", gauss_mutation)
 
 pygadPerformance("tournament", position_crossover)
 pygadPerformance("tournament", multiple_crossover)
