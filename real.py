@@ -5,6 +5,9 @@ import benchmark_functions as bf
 import pygad
 import logging
 
+from matplotlib import pyplot as plt
+
+
 def fitness_function_Styblinski(ga_instance, solution, solution_idx):
     print(type(solution))
     return -bf.StyblinskiTang(len(solution))(solution)
@@ -125,6 +128,16 @@ def pygadPerformance(parent_selection_type="tournament", crossover_type="single_
     num_parents_mating = 20
     num_genes = 2
 
+    average_fitness = []
+    std_fitness = []
+    best_fitness = []
+
+    def callback_generation(ga_instance):
+        fitness = ga_instance.last_generation_fitness
+        average_fitness.append(np.mean(fitness))
+        std_fitness.append(np.std(fitness))
+        best_fitness.append(np.max(fitness))
+
     ga_instance = pygad.GA(num_generations=num_generations,
                            sol_per_pop=sol_per_pop,
                            num_parents_mating=num_parents_mating,
@@ -132,6 +145,7 @@ def pygadPerformance(parent_selection_type="tournament", crossover_type="single_
                            gene_type=float,
                            fitness_func=fitness_function_Rosenbrock,
                            init_range_low=-10,
+                           on_generation=callback_generation,
                            init_range_high=10,
                            parent_selection_type=parent_selection_type,
                            crossover_type=crossover_type,
@@ -149,6 +163,31 @@ def pygadPerformance(parent_selection_type="tournament", crossover_type="single_
         print(f"Parameters: {parent_selection_type}, {crossover_type}, {mutation_type}")
         print(f"Best solution: {solution}\nBest solution fitness: {solution_fitness}")
 
+    plt.figure(figsize=(12, 8))
+
+    plt.subplot(3, 1, 1)
+    plt.plot(average_fitness, label='Average Fitness')
+    plt.title(f"Parameters: {parent_selection_type}, {crossover_type}, {mutation_type}\nAverage Fitness over Generations")
+    plt.xlabel('Generation')
+    plt.ylabel('Average Fitness')
+    plt.legend()
+
+    plt.subplot(3, 1, 2)
+    plt.plot(std_fitness, label='Standard Deviation of Fitness', color='orange')
+    plt.title('Standard Deviation of Fitness over Generations')
+    plt.xlabel('Generation')
+    plt.ylabel('Standard Deviation')
+    plt.legend()
+
+    plt.subplot(3, 1, 3)
+    plt.plot(best_fitness, label='Best Solution Fitness', color='green')
+    plt.title('Best Solution Fitness over Generations')
+    plt.xlabel('Generation')
+    plt.ylabel('Best Fitness')
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
 
 
 pygadPerformance("tournament")
